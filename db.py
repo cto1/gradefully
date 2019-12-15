@@ -2,12 +2,14 @@ import sqlite3
 from sqlite3 import Error
  
  
-def create_connection(db_file):
+def create_connection():
     """ create a database connection to the SQLite database
         specified by the db_file
-    :param db_file: database file
     :return: Connection object or None
     """
+    
+    db_file = r"./database/gradefully.db"
+
     conn = None
     try:
         conn = sqlite3.connect(db_file)
@@ -31,6 +33,28 @@ def select_all_users(conn):
     for row in rows:
         print(row)
  
+
+def login_user(conn, userName, password):
+    """
+    Query the user table
+    :param conn: the Connection object
+    :param userName: user entered identifier 
+    :param password: user entered password
+    :return:
+    """
+
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM user WHERE email = ? AND password = ?", (userName, password) )
+
+    row = cur.fetchone()
+
+    if row:
+        print('You are logged in')
+        auth = True 
+    else:
+        print('Username and password not found')
+        auth = False
+
  
 # def select_task_by_priority(conn, priority):
 #     """
@@ -49,10 +73,9 @@ def select_all_users(conn):
  
  
 def main():
-    database = r"./database/gradefully.db"
  
     # create a database connection
-    conn = create_connection(database)
+    conn = create_connection()
     with conn:
         print("1. Query users:")
         select_all_users(conn)
@@ -62,4 +85,7 @@ def main():
  
  
 if __name__ == '__main__':
+    
+    # global variable for authorisation state of the user 
+    auth = False
     main()
